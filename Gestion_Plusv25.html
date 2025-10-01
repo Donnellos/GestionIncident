@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport Plus - Système de gestion des travaux DRTET ABIDJAN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f4f4f4;
+        }
+        
+        .sidebar {
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar-hidden {
+            transform: translateX(-100%);
+        }
+        
+        @media (min-width: 768px) {
+            .sidebar {
+                transform: translateX(0);
+            }
+            .sidebar-hidden {
+                transform: translateX(0);
+            }
+        }
+        
+        .active-section {
+            display: block !important;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.4em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+        }
+        
+        .badge-success {
+            color: #fff;
+            background-color: #28a745;
+        }
+        
+        .badge-warning {
+            color: #212529;
+            background-color: #ffc107;
+        }
+        
+        .badge-danger {
+            color: #fff;
+            background-color: #dc3545;
+        }
+        
+        .badge-info {
+            color: #fff;
+            background-color: #17a2b8;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white text-center py-4">
+        <h1 class="text-2xl font-bold">Rapport Plus v25</h1>
+        <p class="text-sm">Système de gestion des travaux DRTET ABIDJAN</p>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex flex-1">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-gray-800 text-white p-4 md:static md:w-1/5 sidebar-hidden md:!translate-x-0">
+            <button id="toggleSidebar" class="md:hidden mb-4 text-white">☰ Menu</button>
+            <ul class="space-y-2">
+                <li><a href="#dashboard" class="nav-link block py-2 px-4 hover:bg-gray-700 rounded" data-section="dashboard">Tableau de bord</a></li>
+                <li><a href="#travaux" class="nav-link block py-2 px-4 hover:bg-gray-700 rounded" data-section="travaux">Travaux</a></li>
+                <li><a href="#postes" class="nav-link block py-2 px-4 hover:bg-gray-700 rounded" data-section="postes">Postes</a></li>
+                <li><a href="#ouvrages" class="nav-link block py-2 px-4 hover:bg-gray-700 rounded" data-section="ouvrages">Ouvrages</a></li>
+                <li><a href="#equipes" class="nav-link block py-2 px-4 hover:bg-gray-700 rounded" data-section="equipes">Equipes de Maintenance</a></li>
+                <li><a href="#service" class="nav-link block py-2 px-4 hover:bg-gray-700 rounded" data-section="service">Service de Maintenance</a></li>
+                <li><a href="#materiels" class="nav-link block py-2 px-4 hover:bg-gray-700 rounded" data-section="materiels">Matériels</a></li>
+                <li><a href="#rapports" class="nav-link block py-2 px-4 hover:bg-gray-700 rounded" data-section="rapports">Rapports d'activités</a></li>
+                <li><a href="#sync" class="nav-link block py-2 px-4 hover:bg-gray-700 rounded" data-section="sync">Synchroniser <span id="sync-count">0</span></a></li>
+                <li><a href="#" id="logout-btn" class="block py-2 px-4 hover:bg-gray-700 rounded">Déconnexion</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+            <!-- Login Section -->
+            <section id="login" class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <form id="loginForm" class="space-y-4">
+                    <div>
+                        <label for="email" class="block text-sm font-medium">Email</label>
+                        <input type="email" id="email" class="w-full p-2 border rounded" required>
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium">Mot de passe</label>
+                        <input type="password" id="password" class="w-full p-2 border rounded" required>
+                    </div>
+                    <div>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="mr-2"> Se souvenir de moi
+                        </label>
+                    </div>
+                    <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Connexion</button>
+                </form>
+                <a href="#" class="text-blue-600 text-sm mt-2 inline-block">Mot de passe oublié?</a>
+            </section>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section-content bg-white p-6 rounded-lg shadow-md mb-8 hidden">
+                <h2 class="text-xl font-bold mb-4">Tableau de bord</h2>
+                <div class="flex items-center mb-4">
+                    <span class="bg-blue-100 text-blue-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded">3</span>
+                    <div>
+                        <p class="font-semibold">Akaffou Arnaud H</p>
+                        <p class="text-sm text-gray-600">Administrateur</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                    <div class="bg-gray-100 p-4 rounded-lg text-center">
+                        <h3 class="text-2xl font-bold" id="completed-works">0</h3>
+                        <p>Travaux terminés</p>
+                    </div>
+                    <div class="bg-gray-100 p-4 rounded-lg text-center">
+                        <h3 class="text-2xl font-bold" id="in-progress-works">0</h3>
+                        <p>Travaux en cours</p>
+                    </div>
+                    <div class="bg-gray-100 p-4 rounded-lg text-center">
+                        <h3 class="text-2xl font-bold" id="suspended-works">0</h3>
+                        <p>Travaux suspendus</p>
+                    </div>
+
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Travaux par mois (Année en cours)</h3>
+                        <div class="chart-container">
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Répartition des travaux</h3>
+                        <div class="chart-container">
+                            <canvas id="repartitionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-2">Alertes - Travaux non réalisés</h3>
+                    <div id="alertes-travaux">
+                        <!-- Les alertes seront générées dynamiquement -->
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-2">Travaux non terminés</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-gray-200">
+                                    <th class="p-2">ID</th>
+                                    <th class="p-2">Nature des travaux</th>
+                                    <th class="p-2">Poste</th>
+                                    <th class="p-2">Début</th>
+                                    <th class="p-2">Fin prévue</th>
+                                    <th class="p-2">Statut</th>
+                                    <th class="p-2">Responsable</th>
+                                </tr>
+                            </thead>
+                            <tbody id="unfinished-works-body">
+                                <!-- Les travaux non terminés seront générés dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Derniers travaux enregistrés</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-gray-200">
+                                    <th class="p-2">ID</th>
+                                    <th class="p-2">Nature des travaux</th>
+                                    <th class="p-2">Poste</th>
+                                    <th class="p-2">Début</th>
+                                    <th class="p-2">Fin prévue</th>
+                                    <th class="p-2">Statut</th>
+                                    <th class="p-2">Responsable</th>
+                                </tr>
+                            </thead>
+                            <tbody id="latest-works-body">
+                                <!-- Les derniers travaux seront générés dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Travaux Section -->
+            <section id="travaux" class="section-content bg-white p-6 rounded-lg shadow-md mb-8 hidden">
+                <h2 class="text-xl font-bold mb-4">Gestion des Travaux</h2>
+                <form id="travaux-form" class="space-y-6">
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold">Informations de base</h3>
+                        <label class="block">
+                            <span class="text-sm font-medium">Numéro de travaux</span>
+                            <input type="text" name="numero" class="w-full p-2 border rounded" required>
+                        </label>
+                        <label class="block">
+                            <span class="text-sm font-medium">Nature des travaux</span>
+                            <input type="text" name="nature" class="w-full p-2 border rounded" required>
+                        </label>
+                        <label class="block">
+                            <span class="text-sm font-medium">Poste</span>
+                            <select name="poste" class="w-full p-2 border rounded"><option>Sélectionner un poste</option>
+                                <option>Poste 225Kv ABOBO</option>
+                                <option>Poste 225Kv ABROBAKO</option>
+                                <option>Poste 225Kv ANANI</option>
+                                <option>Poste 225Kv ANOUMANBO</option>
+                                <option>Poste 400Kv AZITO</option>
+                                <option>Poste 225Kv AZITO</option>
+                                <option>Poste 225Kv BIA NORD</option>
+                                <option>Poste 225Kv BIA SUD</option>
+                                <option>Poste 225Kv BINGERVILLE</option>
+                                <option>Poste 225Kv BONGO</option>
+                                <option>Poste 400Kv PK-24</option>
+                                <option>Poste 225Kv PK-24</option>
+                                <option>Poste 225Kv TAABO</option>
+                                <option>Poste 400Kv TABOTH</option>
+                                <option>Poste 225Kv YOP 1</option>
+                                <option>Poste 225Kv YOP 2</option>
+                                <option>Poste 90Kv PLATEAU</option>
+                                <option>Poste 225Kv VRIDI</option>
+                                <option>Poste 225Kv TREICHVILLE</option>
+                                <option>Poste 225Kv RIVIERA</option>
+                                <option>Poste 90Kv AGBOVILLE</option>
+                            </select>
+                        </label>
+                        <label class="block">
+                            <span class="text-sm font-medium">Ouvrage</span>
+                            <select name="ouvrage" class="w-full p-2 border rounded"><option>Sélectionner un ouvrage</option>
+                                <option>Disjoncteur 225Kv</option>
+                                <option>Disjoncteur 90Kv</option>
+                                <option>Disjoncteur de couplage 225Kv</option>
+                                <option>Sectionneur ligne 225Kv</option>
+                                <option>Sectionneur Aiguillage 225Kv</option>
+                                <option>Sectionneur ligne 90Kv</option>
+                                <option>Sectionneur Barre 225KvKv</option>
+                                <option>Sectionneur Barre 90Kv</option>
+                                <option>Jeu de Barre 225Kv</option>
+                                <option>Jeu de Barre 90Kv</option>
+                                <option>Tendu 90Kv</option>
+                                <option>Tfo 225/90Kv</option>
+                                <option>Tfo 90/30Kv</option>
+                                <option>Tfo 90/15Kv</option>
+                                <option>TT 225Kv</option>
+                                <option>TT 90Kv</option>
+                                <option>TC 225Kv</option>
+                                <option>TC 90Kv</option>
+                                <option>Circuit bouchons</option>
+                                <option>Poste 225Kv PK-24</option> 
+                            </select>
+                        </label>
+                        <label class="block">
+                            <span class="text-sm font-medium">Responsable</span>
+                            <select name="responsable" class="w-full p-2 border rounded"><option>Sélectionner un responsable</option>
+                                <option>DR</option>
+                                <option>ADR-X</option>
+                                <option>ADR-M</option>
+                                <option>ING-X</option>
+                                <option>ATP</option>
+                            </select>
+                        </label>
+                        <label class="block">
+                            <span class="text-sm font-medium">Statut</span>
+                            <select name="statut" class="w-full p-2 border rounded" required>
+                                <option>En cours</option>
+                                <option>Terminé</option>
+                                <option>Suspendu</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold">Dates et Heure clés des Travaux</h3>
+                        <label class="block">
+                            <span class="text-sm font-medium">Date et heure de début</span>
+                            <input type="datetime-local" name="debut" class="w-full p-2 border rounded">
+                        </label>
+                        <label class="block">
+                            <span class="text-sm font-medium">Date de fin prévue</span>
+                            <input type="datetime-local" name="fin" class="w-full p-2 border rounded">
+                        </label>
+                        <label class="block">
+                            <span class="text-sm font-medium">Date et heure de retrait</span>
+                            <input type="datetime-local" name="retrait" class="w-full p-2 border rounded">
+                        </label>
+                        <label class="block">
+                            <span class="text-sm font-medium">Remise DAOE</span>
+                                <select name="statut" class="w-full p-2 border rounded" required>
+                                    <option>Attestation de Prémieère Etape de Consignation</option>
+                                    <option>Attestation de Consignation en Une Etape</option>
+                                    <option>Autorisation de Travail</option>
+                                    <option>Avis de Requisition</option>
+                                    <option>Autorisation de Travail sous Tension</option>
+                                </select>
+                        </label>
+                        <label class="block">
+                            <span class="text-sm font-medium">Remise AFT</span>
+                            <input type="datetime-local" name="aft" class="w-full p-2 border rounded">
+                        </label>
+                        <label class="block">
+                            <span class="text-sm font-medium">RACDR</span>
+                            <input type="datetime-local" name="racdr" class="w-full p-2 border rounded">
+                        </label>
+                        <label class="block">
+                            <span class="text-sm font-medium">Fin kWh</span>
+                            <input type="text" name="fin_kwh" class="w-full p-2 border rounded">
+                        </label>
+                    </div>
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold">Ressources</h3>
+                        <label class="block">
+                            <span class="text-sm font-medium">Equipements</span>
+                            <input type="text" name="materiels" class="w-full p-2 border rounded">
+                        </label>
+                        <label class="block">
+                            <span class="text-sm font-medium">Service de Maintenance</span>
+                            <input type="text" name="entreprise" class="w-full p-2 border rounded">
+                        </label>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="reset" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Annuler</button>
+                        <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Enregistrer</button>
+                    </div>
+                </form>
+
+                <h3 class="text-lg font-semibold mt-8">Liste des Travaux</h3>
+                <table class="w-full border-collapse mt-4">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-2">ID</th>
+                            <th class="p-2">Numéro</th>
+                            <th class="p-2">Nature</th>
+                            <th class="p-2">Poste</th>
+                            <th class="p-2">Début</th>
+                            <th class="p-2">Statut</th>
+                            <th class="p-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="travaux-table-body"></tbody>
+                </table>
+            </section>
+
+            <!-- Postes Section -->
+            <section id="postes" class="section-content bg-white p-6 rounded-lg shadow-md mb-8 hidden">
+                <h2 class="text-xl font-bold mb-4">Gestion des Postes</h2>
+                <form id="postes-form" class="space-y-4">
+                    <label class="block">
+                        <span class="text-sm font-medium">Nom du poste</span>
+                        <input type="text" name="nom" class="w-full p-2 border rounded" required>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Voltage</span>
+                        <input type="text" name="voltage" class="w-full p-2 border rounded" required>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Localisation</span>
+                        <input type="text" name="localisation" class="w-full p-2 border rounded" required>
+                    </label>
+                    <div class="flex space-x-4">
+                        <button type="reset" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Annuler</button>
+                        <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Enregistrer</button>
+                    </div>
+                </form>
+
+                <h3 class="text-lg font-semibold mt-8">Liste des Postes</h3>
+                <table class="w-full border-collapse mt-4">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-2">ID</th>
+                            <th class="p-2">Nom</th>
+                            <th class="p-2">Voltage</th>
+                            <th class="p-2">Localisation</th>
+                            <th class="p-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="postes-table-body"></tbody>
+                </table>
+            </section>
+
+            <!-- Ouvrages Section -->
+            <section id="ouvrages" class="section-content bg-white p-6 rounded-lg shadow-md mb-8 hidden">
+                <h2 class="text-xl font-bold mb-4">Gestion des Ouvrages</h2>
+                <form id="ouvrages-form" class="space-y-4">
+                    <label class="block">
+                        <span class="text-sm font-medium">Nom de l'ouvrage</span>
+                        <input type="text" name="nom" class="w-full p-2 border rounded" required>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Type d'ouvrage</span>
+                        <select name="type" class="w-full p-2 border rounded" required>
+                                <option>Disjoncteur 225Kv</option>
+                                <option>Disjoncteur 90Kv</option>
+                                <option>Disjoncteur de couplage 225Kv</option>
+                                <option>Sectionneur ligne 225Kv</option>
+                                <option>Sectionneur Aiguillage 225Kv</option>
+                                <option>Sectionneur ligne 90Kv</option>
+                                <option>Sectionneur Barre 225KvKv</option>
+                                <option>Sectionneur Barre 90Kv</option>
+                                <option>Jeu de Barre 225Kv</option>
+                                <option>Jeu de Barre 90Kv</option>
+                                <option>Tendu 90Kv</option>
+                                <option>Tfo 225/90Kv</option>
+                                <option>Tfo 90/30Kv</option>
+                                <option>Tfo 90/15Kv</option>
+                                <option>TT 225Kv</option>
+                                <option>TT 90Kv</option>
+                                <option>TC 225Kv</option>
+                                <option>TC 90Kv</option>
+                                <option>Circuit bouchons</option>
+                                <option>Poste 225Kv PK-24</option> 
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Description</span>
+                        <textarea name="description" class="w-full p-2 border rounded"></textarea>
+                    </label>
+                    <div class="flex space-x-4">
+                        <button type="reset" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Annuler</button>
+                        <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Enregistrer</button>
+                    </div>
+                </form>
+
+                <h3 class="text-lg font-semibold mt-8">Liste des Ouvrages</h3>
+                <table class="w-full border-collapse mt-4">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-2">ID</th>
+                            <th class="p-2">Nom de l'Ouvrage</th>
+                            <th class="p-2">Type d'Ouvrage</th>
+                            <th class="p-2">Description</th>
+                            <th class="p-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ouvrages-table-body"></tbody>
+                </table>
+            </section>
+
+            <!-- Equipes Section -->
+            <section id="equipes" class="section-content bg-white p-6 rounded-lg shadow-md mb-8 hidden">
+                <h2 class="text-xl font-bold mb-4">Gestion du Personnel</h2>
+                <form id="equipes-form" class="space-y-4">
+                    <label class="block">
+                        <span class="text-sm font-medium">Nom complet</span>
+                        <input type="text" name="nom" class="w-full p-2 border rounded" required>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Rôle</span>
+                        <select name="role" class="w-full p-2 border rounded" required>
+                            <option>Ingénieur électricien</option>
+                            <option>Technicien</option>
+                            <option>Chef de projet</option>
+                            <option>Administrateur</option>
+                            <option>Stagiaire</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Email</span>
+                        <input type="email" name="email" class="w-full p-2 border rounded" required>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Téléphone</span>
+                        <input type="tel" name="telephone" class="w-full p-2 border rounded" required>
+                    </label>
+                    <div class="flex space-x-4">
+                        <button type="reset" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Annuler</button>
+                        <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Enregistrer</button>
+                    </div>
+                </form>
+
+                <h3 class="text-lg font-semibold mt-8">Liste du Personnel</h3>
+                <table class="w-full border-collapse mt-4">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-2">ID</th>
+                            <th class="p-2">Nom</th>
+                            <th class="p-2">Rôle</th>
+                            <th class="p-2">Email</th>
+                            <th class="p-2">Téléphone</th>
+                            <th class="p-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="equipes-table-body"></tbody>
+                </table>
+            </section>
+
+            <!-- Service Section -->
+            <section id="service" class="section-content bg-white p-6 rounded-lg shadow-md mb-8 hidden">
+                <h2 class="text-xl font-bold mb-4">Gestion des Entreprises</h2>
+                <form id="service-form" class="space-y-4">
+                    <label class="block">
+                        <span class="text-sm font-medium">Nom de l'entreprise</span>
+                        <input type="text" name="nom" class="w-full p-2 border rounded" required>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Contact principal</span>
+                        <input type="text" name="contact" class="w-full p-2 border rounded" required>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Téléphone</span>
+                        <input type="tel" name="telephone" class="w-full p-2 border rounded" required>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Email</span>
+                        <input type="email" name="email" class="w-full p-2 border rounded" required>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Adresse</span>
+                        <textarea name="adresse" class="w-full p-2 border rounded" required></textarea>
+                    </label>
+                    <div class="flex space-x-4">
+                        <button type="reset" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Annuler</button>
+                        <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Enregistrer</button>
+                    </div>
+                </form>
+
+                <h3 class="text-lg font-semibold mt-8">Liste des Entreprises</h3>
+                <table class="w-full border-collapse mt-4">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-2">ID</th>
+                            <th class="p-2">Nom</th>
+                            <th class="p-2">Contact</th>
+                            <th class="p-2">Téléphone</th>
+                            <th class="p-2">Email</th>
+                            <th class="p-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="service-table-body"></tbody>
+                </table>
+            </section>
+
+            <!-- Materiels Section -->
+            <section id="materiels" class="section-content bg-white p-6 rounded-lg shadow-md mb-8 hidden">
+                <h2 class="text-xl font-bold mb-4">Gestion des Matériels</h2>
+                <form id="materiels-form" class="space-y-4">
+                    <label class="block">
+                        <span class="text-sm font-medium">Code matériel</span>
+                        <input type="text" name="code" class="w-full p-2 border rounded" required>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Libellé</span>
+                        <input type="text" name="libelle" class="w-full p-2 border rounded" required>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Type</span>
+                        <select name="type" class="w-full p-2 border rounded" required>
+                            <option>Équipement électrique</option>
+                            <option>Outillage</option>
+                            <option>Sécurité</option>
+                            <option>Mesure</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Quantité disponible</span>
+                        <input type="number" name="quantite" class="w-full p-2 border rounded" required>
+                    </label>
+                    <div class="flex space-x-4">
+                        <button type="reset" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Annuler</button>
+                        <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Enregistrer</button>
+                    </div>
+                </form>
+
+                <h3 class="text-lg font-semibold mt-8">Liste des Matériels</h3>
+                <table class="w-full border-collapse mt-4">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-2">Code</th>
+                            <th class="p-2">Libellé</th>
+                            <th class="p-2">Type</th>
+                            <th class="p-2">Disponible</th>
+                            <th class="p-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="materiels-table-body"></tbody>
+                </table>
+            </section>
+
+            <!-- Rapports Section -->
+            <section id="rapports" class="section-content bg-white p-6 rounded-lg shadow-md mb-8 hidden">
+                <h2 class="text-xl font-bold mb-4">Génération de Rapports</h2>
+                <form id="rapports-form" class="space-y-4">
+                    <label class="block">
+                        <span class="text-sm font-medium">Type de rapport</span>
+                        <select name="type" class="w-full p-2 border rounded">
+                            <option>Hebdomadaire</option>
+                            <option>Mensuel</option>
+                            <option>Annuel</option>
+                            <option>Par statut</option>
+                            <option>Travaux retardés</option>
+                        </select>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Date de début</span>
+                        <input type="date" name="debut" class="w-full p-2 border rounded">
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium">Date de fin</span>
+                        <input type="date" name="fin" class="w-full p-2 border rounded">
+                    </label>
+                    <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Générer le rapport</button>
+                </form>
+
+                <div class="mt-8 hidden" id="rapport-result">
+                    <h3 class="text-lg font-semibold mb-2">Détails du rapport</h3>
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="p-2">ID</th>
+                                <th class="p-2">Nature</th>
+                                <th class="p-2">Poste</th>
+                                <th class="p-2">Début</th>
+                                <th class="p-2">Fin</th>
+                                <th class="p-2">Statut</th>
+                                <th class="p-2">Coût (€)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rapport-table-body">
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-lg font-semibold mb-2">Exporter les rapports</h3>
+                    <div class="space-y-4">
+                        <div class="bg-gray-100 p-4 rounded-lg">
+                            <p class="font-semibold">Rapport hebdomadaire</p>
+                            <p>Résumé des travaux réalisés cette semaine avec détails sur les coûts et avancement.</p>
+                            <button onclick="exportReport('hebdomadaire')" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Télécharger PDF</button>
+                        </div>
+                        <div class="bg-gray-100 p-4 rounded-lg">
+                            <p class="font-semibold">Rapport mensuel</p>
+                            <p>Analyse complète des travaux du mois, statistiques et indicateurs clés.</p>
+                            <button onclick="exportReport('mensuel')" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Télécharger Excel</button>
+                        </div>
+                        <div class="bg-gray-100 p-4 rounded-lg">
+                            <p class="font-semibold">Rapport annuel</p>
+                            <p>Synthèse annuelle des activités, bilan financier et planification future.</p>
+                            <button onclick="exportReport('annuel')" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Télécharger PDF</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sync Section -->
+            <section id="sync" class="section-content bg-white p-6 rounded-lg shadow-md mb-8 hidden">
+                <h2 class="text-xl font-bold mb-4">Synchronisation des Données</h2>
+                <p>Les données sont d'abord enregistrées localement. Synchronisez avec le serveur lorsque vous avez une connexion internet.</p>
+                <h3 class="text-lg font-semibold mt-4">Données en attente de synchronisation</h3>
+                <table class="w-full border-collapse mt-4">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-2">Type</th>
+                            <th class="p-2">Nombre</th>
+                            <th class="p-2">Dernière modification</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sync-table-body"></tbody>
+                </table>
+                <div class="flex space-x-4 mt-4">
+                    <button id="sync-now" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Synchroniser maintenant</button>
+                    <button id="clear-local" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Effacer les données locales</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 text-center py-4 text-gray-600">
+        <p id="status">Hors ligne - Données locales </p>
+    </footer>
+
+    <script>
+        // Local Storage Keys
+        const STORAGE_KEYS = {
+            travaux: 'local_travaux',
+            postes: 'local_postes',
+            ouvrages: 'local_ouvrages',
+            equipes: 'local_equipes',
+            service: 'local_service',
+            materiels: 'local_materiels',
+            syncPending: 'sync_pending',
+            loggedIn: 'logged_in'
+        };
+
+        // Helper Functions
+        function getLocalData(key) {
+            return JSON.parse(localStorage.getItem(key)) || [];
+        }
+
+        function setLocalData(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+            addToPendingSync(key);
+            updateSyncCount();
+            updateDashboardStats();
+            updateDashboardTables(); // Mettre à jour les tableaux du dashboard
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5).toUpperCase();
+        }
+
+        function addToPendingSync(key) {
+            const pending = getLocalData(STORAGE_KEYS.syncPending);
+            if (!pending.includes(key)) {
+                pending.push(key);
+                localStorage.setItem(STORAGE_KEYS.syncPending, JSON.stringify(pending));
+            }
+        }
+
+        function updateSyncCount() {
+            const pending = getLocalData(STORAGE_KEYS.syncPending);
+            document.getElementById('sync-count').textContent = pending.length;
+        }
+
+        function updateDashboardStats() {
+            const travaux = getLocalData(STORAGE_KEYS.travaux);
+            const completed = travaux.filter(t => t.statut === 'Terminé').length;
+            const inProgress = travaux.filter(t => t.statut === 'En cours').length;
+            const suspended = travaux.filter(t => t.statut === 'Suspendu').length;
+
+            document.getElementById('completed-works').textContent = completed;
+            document.getElementById('in-progress-works').textContent = inProgress;
+            document.getElementById('suspended-works').textContent = suspended;
+        }
+
+        // Fonction pour mettre à jour les tableaux du dashboard
+        function updateDashboardTables() {
+            const travaux = getLocalData(STORAGE_KEYS.travaux);
+
+            // Trier les travaux par date (du plus récent au plus ancien)
+            travaux.sort((a, b) => new Date(b.debut || 0) - new Date(a.debut || 0));
+
+            // Afficher les 5 derniers travaux
+            const latestWorksBody = document.getElementById('latest-works-body');
+            latestWorksBody.innerHTML = '';
+
+            const latestWorks = travaux.slice(0, 5);
+            latestWorks.forEach(t => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2">${t.numero || 'N/A'}</td>
+                    <td class="p-2">${t.nature || 'N/A'}</td>
+                    <td class="p-2">${t.poste || 'N/A'}</td>
+                    <td class="p-2">${t.debut || 'N/A'}</td>
+                    <td class="p-2">${t.fin || 'N/A'}</td>
+                    <td class="p-2">
+                        <span class="badge ${getStatusBadgeClass(t.statut)}">${t.statut || 'N/A'}</span>
+                    </td>
+                    <td class="p-2">${t.responsable || 'N/A'}</td>
+                `;
+                latestWorksBody.appendChild(row);
+            });
+
+            // Afficher les travaux non terminés
+            const unfinishedWorksBody = document.getElementById('unfinished-works-body');
+            unfinishedWorksBody.innerHTML = '';
+
+            const unfinishedWorks = travaux.filter(t => t.statut !== 'Terminé');
+            unfinishedWorks.forEach(t => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2">${t.numero || 'N/A'}</td>
+                    <td class="p-2">${t.nature || 'N/A'}</td>
+                    <td class="p-2">${t.poste || 'N/A'}</td>
+                    <td class="p-2">${t.debut || 'N/A'}</td>
+                    <td class="p-2">${t.fin || 'N/A'}</td>
+                    <td class="p-2">
+                        <span class="badge ${getStatusBadgeClass(t.statut)}">${t.statut || 'N/A'}</span>
+                    </td>
+                    <td class="p-2">${t.responsable || 'N/A'}</td>
+                `;
+                unfinishedWorksBody.appendChild(row);
+            });
+
+            // Mettre à jour les alertes
+            updateAlerts(travaux);
+
+            // Mettre à jour les graphiques
+            updateCharts(travaux);
+        }
+
+        // Fonction pour obtenir la classe CSS du badge selon le statut
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'Terminé':
+                    return 'badge-success';
+                case 'En cours':
+                    return 'badge-info';
+                case 'Suspendu':
+                    return 'badge-warning';
+                default:
+                    return 'badge-secondary';
+            }
+        }
+
+        // Fonction pour mettre à jour les alertes
+        function updateAlerts(travaux) {
+            const alertesContainer = document.getElementById('alertes-travaux');
+            alertesContainer.innerHTML = '';
+
+            // Travaux en retard (dépassant la date de fin prévue)
+            const today = new Date();
+            const delayedWorks = travaux.filter(t => {
+                if (!t.fin || t.statut === 'Terminé') return false;
+                const finDate = new Date(t.fin);
+                return finDate < today;
+            });
+
+            if (delayedWorks.length > 0) {
+                delayedWorks.forEach(t => {
+                    const finDate = new Date(t.fin);
+                    const daysDelayed = Math.floor((today - finDate) / (1000 * 60 * 60 * 24));
+
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'bg-yellow-100 p-4 rounded-lg mb-2';
+                    alertDiv.innerHTML = `
+                        <p class="font-semibold">Travaux ${t.numero || 'N/A'} en retard</p>
+                        <p>Poste: ${t.poste || 'N/A'} • Fin prévue: ${t.fin || 'N/A'} • Retard: ${daysDelayed} jours</p>
+                    `;
+                    alertesContainer.appendChild(alertDiv);
+                });
+            } else {
+                const noAlertDiv = document.createElement('div');
+                noAlertDiv.className = 'bg-green-100 p-4 rounded-lg mb-2';
+                noAlertDiv.innerHTML = `<p class="font-semibold">Aucun travail en retard</p>`;
+                alertesContainer.appendChild(noAlertDiv);
+            }
+
+            // Travaux suspendus
+            const suspendedWorks = travaux.filter(t => t.statut === 'Suspendu');
+            if (suspendedWorks.length > 0) {
+                suspendedWorks.forEach(t => {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'bg-red-100 p-4 rounded-lg mb-2';
+                    alertDiv.innerHTML = `
+                        <p class="font-semibold">Travaux ${t.numero || 'N/A'} suspendu</p>
+                        <p>Ouvrage: ${t.ouvrage || 'N/A'} • Poste: ${t.poste || 'N/A'}</p>
+                    `;
+                    alertesContainer.appendChild(alertDiv);
+                });
+            }
+        }
+
+        // Variables pour stocker les instances de graphiques
+        let monthlyChartInstance = null;
+        let repartitionChartInstance = null;
+
+        // Fonction pour mettre à jour les graphiques
+        function updateCharts(travaux) {
+            // Mettre à jour le graphique des travaux par mois
+            updateMonthlyChart(travaux);
+
+            // Mettre à jour le graphique de répartition
+            updateRepartitionChart(travaux);
+        }
+
+        // Fonction pour mettre à jour le graphique des travaux par mois
+        function updateMonthlyChart(travaux) {
+            const currentYear = new Date().getFullYear();
+            const monthlyData = Array(12).fill(0);
+            const monthlyInProgress = Array(12).fill(0);
+
+            travaux.forEach(t => {
+                if (t.debut) {
+                    const startDate = new Date(t.debut);
+                    const month = startDate.getMonth();
+                    const year = startDate.getFullYear();
+
+                    if (year === currentYear) {
+                        monthlyData[month]++;
+
+                        // Compter les travaux en cours par mois
+                        if (t.statut === 'En cours') {
+                            monthlyInProgress[month]++;
+                        }
+                    }
+                }
+            });
+
+            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+
+            // Détruire l'ancien graphique s'il existe
+            if (monthlyChartInstance) {
+                monthlyChartInstance.destroy();
+            }
+
+            // Créer un nouveau graphique
+            monthlyChartInstance = new Chart(monthlyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'],
+                    datasets: [{
+                        label: 'Tous les travaux',
+                        data: monthlyData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Travaux en cours',
+                        data: monthlyInProgress,
+                        backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Nombre de travaux'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Mois'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Travaux par mois - Année ${currentYear}`,
+                            font: {
+                                size: 16
+                            }
+                        },
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        }
+
+        // Fonction pour mettre à jour le graphique de répartition
+        function updateRepartitionChart(travaux) {
+            const completed = travaux.filter(t => t.statut === 'Terminé').length;
+            const inProgress = travaux.filter(t => t.statut === 'En cours').length;
+            const suspended = travaux.filter(t => t.statut === 'Suspendu').length;
+            const planned = travaux.filter(t => !t.statut || t.statut === 'Planifié').length;
+
+            const repartitionCtx = document.getElementById('repartitionChart').getContext('2d');
+
+            // Détruire l'ancien graphique s'il existe
+            if (repartitionChartInstance) {
+                repartitionChartInstance.destroy();
+            }
+
+            // Créer un nouveau graphique
+            repartitionChartInstance = new Chart(repartitionCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Terminés', 'En cours', 'Suspendus', 'Planifiés'],
+                    datasets: [{
+                        data: [completed, inProgress, suspended, planned],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(153, 102, 255, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Répartition des travaux par statut',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Form Handlers
+        function handleTravauxForm(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const travaux = {
+                id: generateId(),
+                numero: formData.get('numero'),
+                nature: formData.get('nature'),
+                poste: formData.get('poste'),
+                ouvrage: formData.get('ouvrage'),
+                responsable: formData.get('responsable'),
+                statut: formData.get('statut'),
+                debut: formData.get('debut'),
+                fin: formData.get('fin'),
+                retrait: formData.get('retrait'),
+                daoe: formData.get('daoe'),
+                aft: formData.get('aft'),
+                racdr: formData.get('racdr'),
+                fin_kwh: formData.get('fin_kwh'),
+                materiels: formData.get('materiels'),
+                entreprise: formData.get('entreprise')
+            };
+
+            const existingTravaux = getLocalData(STORAGE_KEYS.travaux);
+            existingTravaux.push(travaux);
+            setLocalData(STORAGE_KEYS.travaux, existingTravaux);
+
+            e.target.reset();
+            loadTravauxTable();
+            alert('Travaux enregistrés avec succès!');
+        }
+
+        function handlePostesForm(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const poste = {
+                id: generateId(),
+                nom: formData.get('nom'),
+                voltage: formData.get('voltage'),
+                localisation: formData.get('localisation')
+            };
+
+            const existingPostes = getLocalData(STORAGE_KEYS.postes);
+            existingPostes.push(poste);
+            setLocalData(STORAGE_KEYS.postes, existingPostes);
+
+            e.target.reset();
+            loadPostesTable();
+            alert('Poste enregistré avec succès!');
+        }
+
+        function handleOuvragesForm(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const ouvrage = {
+                id: generateId(),
+                nom: formData.get('nom'),
+                type: formData.get('type'),
+                description: formData.get('description')
+            };
+
+            const existingOuvrages = getLocalData(STORAGE_KEYS.ouvrages);
+            existingOuvrages.push(ouvrage);
+            setLocalData(STORAGE_KEYS.ouvrages, existingOuvrages);
+
+            e.target.reset();
+            loadOuvragesTable();
+            alert('Ouvrage enregistré avec succès!');
+        }
+
+        function handleEquipesForm(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const personnel = {
+                id: generateId(),
+                nom: formData.get('nom'),
+                role: formData.get('role'),
+                email: formData.get('email'),
+                telephone: formData.get('telephone')
+            };
+
+            const existingPersonnel = getLocalData(STORAGE_KEYS.equipes);
+            existingPersonnel.push(personnel);
+            setLocalData(STORAGE_KEYS.equipes, existingPersonnel);
+
+            e.target.reset();
+            loadEquipesTable();
+            alert('Personnel enregistré avec succès!');
+        }
+
+        function handleServiceForm(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const entreprise = {
+                id: generateId(),
+                nom: formData.get('nom'),
+                contact: formData.get('contact'),
+                telephone: formData.get('telephone'),
+                email: formData.get('email'),
+                adresse: formData.get('adresse')
+            };
+
+            const existingEntreprises = getLocalData(STORAGE_KEYS.service);
+            existingEntreprises.push(entreprise);
+            setLocalData(STORAGE_KEYS.service, existingEntreprises);
+
+            e.target.reset();
+            loadServiceTable();
+            alert('Entreprise enregistrée avec succès!');
+        }
+
+        function handleMaterielsForm(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const materiel = {
+                id: generateId(),
+                code: formData.get('code'),
+                libelle: formData.get('libelle'),
+                type: formData.get('type'),
+                quantite: formData.get('quantite')
+            };
+
+            const existingMateriels = getLocalData(STORAGE_KEYS.materiels);
+            existingMateriels.push(materiel);
+            setLocalData(STORAGE_KEYS.materiels, existingMateriels);
+
+            e.target.reset();
+            loadMaterielsTable();
+            alert('Matériel enregistré avec succès!');
+        }
+
+        function handleRapportsForm(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const type = formData.get('type');
+            const debut = formData.get('debut');
+            const fin = formData.get('fin');
+
+            // Simuler la génération de rapport
+            document.getElementById('rapport-result').classList.remove('hidden');
+            alert(`Rapport ${type} généré pour la période du ${debut} au ${fin}`);
+        }
+
+        // Table Loaders
+        function loadTravauxTable() {
+            const travaux = getLocalData(STORAGE_KEYS.travaux);
+            const tableBody = document.getElementById('travaux-table-body');
+            tableBody.innerHTML = '';
+
+            travaux.forEach(t => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2">${t.id}</td>
+                    <td class="p-2">${t.numero}</td>
+                    <td class="p-2">${t.nature}</td>
+                    <td class="p-2">${t.poste}</td>
+                    <td class="p-2">${t.debut}</td>
+                    <td class="p-2">${t.statut}</td>
+                    <td class="p-2">
+                        <button class="text-blue-500 hover:text-blue-700" onclick="editTravaux('${t.id}')">Modifier</button>
+                        <button class="text-red-500 hover:text-red-700 ml-2" onclick="deleteTravaux('${t.id}')">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function loadPostesTable() {
+            const postes = getLocalData(STORAGE_KEYS.postes);
+            const tableBody = document.getElementById('postes-table-body');
+            tableBody.innerHTML = '';
+
+            postes.forEach(p => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2">${p.id}</td>
+                    <td class="p-2">${p.nom}</td>
+                    <td class="p-2">${p.voltage}</td>
+                    <td class="p-2">${p.localisation}</td>
+                    <td class="p-2">
+                        <button class="text-blue-500 hover:text-blue-700" onclick="editPoste('${p.id}')">Modifier</button>
+                        <button class="text-red-500 hover:text-red-700 ml-2" onclick="deletePoste('${p.id}')">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function loadOuvragesTable() {
+            const ouvrages = getLocalData(STORAGE_KEYS.ouvrages);
+            const tableBody = document.getElementById('ouvrages-table-body');
+            tableBody.innerHTML = '';
+
+            ouvrages.forEach(o => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2">${o.id}</td>
+                    <td class="p-2">${o.nom}</td>
+                    <td class="p-2">${o.type}</td>
+                    <td class="p-2">${o.description}</td>
+                    <td class="p-2">
+                        <button class="text-blue-500 hover:text-blue-700" onclick="editOuvrage('${o.id}')">Modifier</button>
+                        <button class="text-red-500 hover:text-red-700 ml-2" onclick="deleteOuvrage('${o.id}')">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function loadEquipesTable() {
+            const equipes = getLocalData(STORAGE_KEYS.equipes);
+            const tableBody = document.getElementById('equipes-table-body');
+            tableBody.innerHTML = '';
+
+            equipes.forEach(e => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2">${e.id}</td>
+                    <td class="p-2">${e.nom}</td>
+                    <td class="p-2">${e.role}</td>
+                    <td class="p-2">${e.email}</td>
+                    <td class="p-2">${e.telephone}</td>
+                    <td class="p-2">
+                        <button class="text-blue-500 hover:text-blue-700" onclick="editPersonnel('${e.id}')">Modifier</button>
+                        <button class="text-red-500 hover:text-red-700 ml-2" onclick="deletePersonnel('${e.id}')">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function loadServiceTable() {
+            const services = getLocalData(STORAGE_KEYS.service);
+            const tableBody = document.getElementById('service-table-body');
+            tableBody.innerHTML = '';
+
+            services.forEach(s => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2">${s.id}</td>
+                    <td class="p-2">${s.nom}</td>
+                    <td class="p-2">${s.contact}</td>
+                    <td class="p-2">${s.telephone}</td>
+                    <td class="p-2">${s.email}</td>
+                    <td class="p-2">
+                        <button class="text-blue-500 hover:text-blue-700" onclick="editService('${s.id}')">Modifier</button>
+                        <button class="text-red-500 hover:text-red-700 ml-2" onclick="deleteService('${s.id}')">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function loadMaterielsTable() {
+            const materiels = getLocalData(STORAGE_KEYS.materiels);
+            const tableBody = document.getElementById('materiels-table-body');
+            tableBody.innerHTML = '';
+
+            materiels.forEach(m => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2">${m.code}</td>
+                    <td class="p-2">${m.libelle}</td>
+                    <td class="p-2">${m.type}</td>
+                    <td class="p-2">${m.quantite}</td>
+                    <td class="p-2">
+                        <button class="text-blue-500 hover:text-blue-700" onclick="editMateriel('${m.id}')">Modifier</button>
+                        <button class="text-red-500 hover:text-red-700 ml-2" onclick="deleteMateriel('${m.id}')">Supprimer</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function loadSyncTable() {
+            const pending = getLocalData(STORAGE_KEYS.syncPending);
+            const tableBody = document.getElementById('sync-table-body');
+            tableBody.innerHTML = '';
+
+            const types = {
+                [STORAGE_KEYS.travaux]: 'Travaux',
+                [STORAGE_KEYS.postes]: 'Postes',
+                [STORAGE_KEYS.ouvrages]: 'Ouvrages',
+                [STORAGE_KEYS.equipes]: 'Personnel',
+                [STORAGE_KEYS.service]: 'Entreprises',
+                [STORAGE_KEYS.materiels]: 'Matériels'
+            };
+
+            pending.forEach(key => {
+                const data = getLocalData(key);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-2">${types[key]}</td>
+                    <td class="p-2">${data.length}</td>
+                    <td class="p-2">${new Date().toLocaleString()}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Edit and Delete Functions
+        function editTravaux(id) {
+            const travaux = getLocalData(STORAGE_KEYS.travaux);
+            const travail = travaux.find(t => t.id === id);
+            if (travail) {
+                // Populate form with travail data
+                document.querySelector('input[name="numero"]').value = travail.numero;
+                document.querySelector('input[name="nature"]').value = travail.nature;
+                // ... populate other fields
+
+                // Remove from array and update
+                const updatedTravaux = travaux.filter(t => t.id !== id);
+                setLocalData(STORAGE_KEYS.travaux, updatedTravaux);
+            }
+        }
+
+        function deleteTravaux(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce travail?')) {
+                const travaux = getLocalData(STORAGE_KEYS.travaux);
+                const updatedTravaux = travaux.filter(t => t.id !== id);
+                setLocalData(STORAGE_KEYS.travaux, updatedTravaux);
+                loadTravauxTable();
+            }
+        }
+
+        // Similar functions for other data types would be implemented here
+        function deletePoste(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce poste?')) {
+                const postes = getLocalData(STORAGE_KEYS.postes);
+                const updatedPostes = postes.filter(p => p.id !== id);
+                setLocalData(STORAGE_KEYS.postes, updatedPostes);
+                loadPostesTable();
+            }
+        }
+
+        function deleteOuvrage(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet ouvrage?')) {
+                const ouvrages = getLocalData(STORAGE_KEYS.ouvrages);
+                const updatedOuvrages = ouvrages.filter(o => o.id !== id);
+                setLocalData(STORAGE_KEYS.ouvrages, updatedOuvrages);
+                loadOuvragesTable();
+            }
+        }
+
+        function deletePersonnel(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce membre du personnel?')) {
+                const equipes = getLocalData(STORAGE_KEYS.equipes);
+                const updatedEquipes = equipes.filter(e => e.id !== id);
+                setLocalData(STORAGE_KEYS.equipes, updatedEquipes);
+                loadEquipesTable();
+            }
+        }
+
+        function deleteService(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette entreprise?')) {
+                const services = getLocalData(STORAGE_KEYS.service);
+                const updatedServices = services.filter(s => s.id !== id);
+                setLocalData(STORAGE_KEYS.service, updatedServices);
+                loadServiceTable();
+            }
+        }
+
+        function deleteMateriel(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce matériel?')) {
+                const materiels = getLocalData(STORAGE_KEYS.materiels);
+                const updatedMateriels = materiels.filter(m => m.id !== id);
+                setLocalData(STORAGE_KEYS.materiels, updatedMateriels);
+                loadMaterielsTable();
+            }
+        }
+
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section-content').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Show the selected section
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        // Export function
+        function exportReport(type) {
+            alert(`Exportation du rapport ${type} simulée. En production, cela générerait un fichier téléchargeable.`);
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            const isLoggedIn = localStorage.getItem(STORAGE_KEYS.loggedIn) === 'true';
+
+            if (isLoggedIn) {
+                document.getElementById('login').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                loadTravauxTable();
+                loadPostesTable();
+                loadOuvragesTable();
+                loadEquipesTable();
+                loadServiceTable();
+                loadMaterielsTable();
+                updateSyncCount();
+                updateDashboardStats();
+                updateDashboardTables();
+            }
+
+            // Navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('data-section');
+                    showSection(sectionId);
+                });
+            });
+
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                localStorage.setItem(STORAGE_KEYS.loggedIn, 'true');
+                document.getElementById('login').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                loadTravauxTable();
+                loadPostesTable();
+                loadOuvragesTable();
+                loadEquipesTable();
+                loadServiceTable();
+                loadMaterielsTable();
+                updateSyncCount();
+                updateDashboardStats();
+                updateDashboardTables();
+            });
+
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                localStorage.setItem(STORAGE_KEYS.loggedIn, 'false');
+                document.getElementById('login').classList.remove('hidden');
+                document.querySelectorAll('.section-content').forEach(section => {
+                    section.classList.add('hidden');
+                });
+            });
+
+            // Form submissions
+            document.getElementById('travaux-form').addEventListener('submit', handleTravauxForm);
+            document.getElementById('postes-form').addEventListener('submit', handlePostesForm);
+            document.getElementById('ouvrages-form').addEventListener('submit', handleOuvragesForm);
+            document.getElementById('equipes-form').addEventListener('submit', handleEquipesForm);
+            document.getElementById('service-form').addEventListener('submit', handleServiceForm);
+            document.getElementById('materiels-form').addEventListener('submit', handleMaterielsForm);
+            document.getElementById('rapports-form').addEventListener('submit', handleRapportsForm);
+
+            // Sync
+            document.getElementById('sync-now').addEventListener('click', function() {
+                alert('Synchronisation simulée. En production, cela enverrait les données au serveur.');
+                localStorage.removeItem(STORAGE_KEYS.syncPending);
+                updateSyncCount();
+                loadSyncTable();
+            });
+
+            document.getElementById('clear-local').addEventListener('click', function() {
+                if (confirm('Êtes-vous sûr de vouloir effacer toutes les données locales?')) {
+                    localStorage.clear();
+                    alert('Données locales effacées.');
+                    updateSyncCount();
+                    loadSyncTable();
+                }
+            });
+
+            // Toggle sidebar on mobile
+            document.getElementById('toggleSidebar').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('sidebar-hidden');
+            });
+        });
+    </script>
+</body>
+
+</html>
